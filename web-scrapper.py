@@ -26,7 +26,7 @@ for link in soup.find_all('a'):  # Find all <a> tags
 
 print(href_list)
 
-# Create new links
+# Access and save hyper links
 target_link_list = [];
 
 for h in href_list:
