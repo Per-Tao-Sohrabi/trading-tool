@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 #main_site = driver.get('https://www.riktkurs.nu/')
 
 base_url = 'https://www.riktkurs.nu/' # will be extractwd from a database list of urls
+keyword = ''
 website = requests.get(base_url)
 
 soup = BeautifulSoup(website.text, 'html.parser')
