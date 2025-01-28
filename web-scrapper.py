@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 
 #main_site = driver.get('https://www.riktkurs.nu/')
 
-base_url = 'https://www.riktkurs.nu/'
+base_url = 'https://www.riktkurs.nu/' # will be extractwd from a database list of urls
 website = requests.get(base_url)
 
 soup = BeautifulSoup(website.text, 'html.parser')
@@ -26,14 +26,17 @@ for link in soup.find_all('a'):  # Find all <a> tags
 
 print(href_list)
 
-# Access and save hyper links
-target_link_list = [];
+# Access and save raw hyper links
+hyper_link_list = [];
 
 for h in href_list:
     nomralized_h = h.lstrip("/");
-    target_link = base_url + nomralized_h
-    nomralized_target_link = target_link + "/";
-    target_link_list.append(nomralized_target_link);
-    #print(target_link)
+    hyper_link = base_url + nomralized_h
+    nomralized_hyper_link = hyper_link + "/";
+    hyper_link_list.append(nomralized_hyper_link);
+    #print(hyper_link)
+print(hyper_link_list)
 
-print(target_link_list)
+# filter hypeelinks based on content
+# to be done from a separet class script
+
