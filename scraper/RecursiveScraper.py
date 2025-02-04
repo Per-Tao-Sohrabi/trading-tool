@@ -9,22 +9,27 @@ from urllib.parse import urljoin
 
 class RecursiveScraper:
 
-    def __init__(self, key_words_dict=None, base_url=None):
-        self.key_words = key_words_dict
+    def __init__(self):  #self, key_words_dict=None, base_url=None
+        #self.key_words = key_words_dict
 
-        self.recursions = (
-            len(self.key_words) - 1
-        )  # len = 1. # declare number of recursive steps.
+        #self.recursions = (
+        #    len(self.key_words) - 1
+        #)  # len = 1. # declare number of recursive steps.
 
-        self.super_url = base_url
+        #self.super_url = base_url
 
         self.result = []
 
         pass
 
-    def scrap(self):
+    def scrap(self, key_words_dict=None, base_url=None):
+        
+        recursions = (
+            len(key_words_dict) - 1
+        )  # len = 1. # declare number of recursive steps.
+
         self.recursiveScraping(
-            url=self.super_url, recursions=self.recursions, key_words=self.key_words
+            url=base_url, recursions=recursions, key_words=key_words_dict
         )
         return self.result
 
@@ -36,7 +41,6 @@ class RecursiveScraper:
         # Super case
         if tot_recur == None:
             tot_recur = recursions
-            # tot_recur = recur 1.
             print("Total recurrsions identified: ", tot_recur)
 
         # distancet to base page
@@ -146,6 +150,7 @@ class RecursiveScraper:
 
 
 # MAIN
+'''
 key_words = {
     1: ["a", "LatestRecommendationsForStockPerRecommender"],
     0: ["a", "LatestRecommendationsForStockPerRecommender"],
@@ -158,3 +163,4 @@ riktskurs_scraper = RecursiveScraper(key_words, base_url=url)
 results = riktskurs_scraper.scrap()
 
 print(len(results))
+'''

@@ -4,11 +4,12 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import re
-
+import sqlite3
 # driver = webdriver.Firefox()
 
 # main_site = driver.get('https://www.riktkurs.nu/')
 
+'''
 base_url = (
     "https://www.riktkurs.nu/senaste"  # will be extractwd from a database list of urls
 )
@@ -57,3 +58,23 @@ for l in hyper_link_list:
         #    stock_pages.append(l)
         print("Append", l)
 print(stock_pages)
+'''
+
+con = sqlite3.connect("tradingtool.db")
+cur = con.cursor()
+
+#cur.execute("CREATE TABLE main(src_name, src_url, trgt_url)")
+
+res = cur.execute("SELECT name FROM sqlite_master")
+result = res.fetchall()
+print(result)
+
+
+cur.execute("""
+    INSERT INTO main VALUES 
+            ('riktkurser.se', 'https://www.riktkurs.nu/senaste/', 'https://www.riktkurs.nu/')
+            """)
+con.commit()
+
+
+
