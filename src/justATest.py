@@ -1,5 +1,7 @@
 from RecursiveScraper import RecursiveScraper
 
+riktskurs_scraper = RecursiveScraper()
+
 key_words = {
     1: ["a", "LatestRecommendationsForStockPerRecommender"],
     0: ["a", "LatestRecommendationsForStockPerRecommender"],
@@ -7,8 +9,6 @@ key_words = {
 # url = input()
 url = "https://www.riktkurs.nu/"
 
-riktskurs_scraper = RecursiveScraper()
-
-results = riktskurs_scraper.scrap(key_words, base_url=url)
+results = riktskurs_scraper.scrap(key_words, source_url=url, base_url=url)
 
 print(len(results))

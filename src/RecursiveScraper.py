@@ -13,47 +13,52 @@ class RecursiveScraper:
         self.result = []
         pass
 
-    def scrap(self, key_words_dict=None, base_url=None):
+    def scrap(self, key_words_dict=None, source_url=None, base_url=None):
         self.result.clear();
         recursions = (len(key_words_dict) - 1)  # len = 1. # declare number of recursive steps.
+        
         self.recursiveScraping(
-            url=base_url, recursions=recursions, key_words=key_words_dict
+            source_url=source_url, base_url=base_url, recursions=recursions, key_words=key_words_dict
         )
         return self.result
 
     # RECURSIVE SCRAPING MECHANISM
-    def recursiveScraping(self, url="", recursions=None, key_words={}, tot_recur=None):
-        # Normalize url
-        base_url = url.rstrip("/")
+    def recursiveScraping(self, source_url=None, base_url=None, recursions=None, key_words={}, tot_recur=None):
+        
+
+        # Retrive current page soup
+        current_page = requests.get(source_url)
+        current_page_soup = BeautifulSoup(current_page.text, "html.parser")
+            
 
         # Super case
         if tot_recur == None:
             tot_recur = recursions
+            source_url = base_url
             print("Total recurrsions identified: ", tot_recur)
 
-        # distancet to base page
+        # Calculate distancet to base page
         distance = recursions
         print("Distance to base case: ", distance)
 
         # Isolate keyword at current level
         keyword_hash = key_words[
-            distance
+            str(distance)
         ]  # Observed the current base keyword dictionary at the end of the keywords list.
         print("Sub page regex filters: ", keyword_hash)
 
+        # Normalize url
+        source_url_url = source_url.rstrip("/")
+        
         # Base case
         if recursions == 0:
-            print("At base page: ", base_url)
+            print("At base page: ", source_url)
 
-            page = requests.get(url)
-
-            page_soup = BeautifulSoup(page.text, "html.parser")
-
-            target_element_lines = page_soup.find_all(
+            target_element_lines = current_page_soup.find_all(
                 keyword_hash[0], re.compile(keyword_hash[1])
             )
 
-            output = [url, target_element_lines]
+            output = [source_url, target_element_lines]
 
             self.result.append(output)
 
@@ -63,21 +68,15 @@ class RecursiveScraper:
             # update recursion
             recursions -= 1
 
-            # retrive next url
-            current_page = requests.get(url)
-            current_page_soup = BeautifulSoup(current_page.text, "html.parser")
-
             # identify and filter sub-urls
             hyperlinks = []
-            for a_element in current_page_soup.find_all(
-                "a"
-            ):  # filters through all <a> elements on the page.
-                href = a_element.get("href")
-                # extract the href term in a_element.
-
+            for a_element in current_page_soup.find_all("a"):  # filters through all <a> elements on the page.
+                
+                href = a_element.get("href") # extract the href term in a_element.
+                
                 # concatenate complete url
                 hyperlink = self.normalize_href(
-                    base_url, href
+                    source_url, href
                 )  # extract the full hyperlink
 
                 # store hyperlink
@@ -107,31 +106,31 @@ class RecursiveScraper:
 
             for hyperlink in filtered_hyperlinks:
                 self.recursiveScraping(
-                    url=hyperlink,
+                    source_url=hyperlink,
                     recursions=recursions,
                     key_words=key_words,
                     tot_recur=tot_recur,
                 )
 
     # HELPER FUNCTION
-    def normalize_href(self, base_url="", href=""):
+    def normalize_href(self, source_url="", href=""):
         if href.startswith("http"):  # Absolute URL (No change needed)
             full_url = href
             link_type = "Absolute URL"
         elif href.startswith("//"):  # Protocol-relative URL
-            full_url = base_url.split(":")[0] + ":" + href
+            full_url = source_url.split(":")[0] + ":" + href
             link_type = "Protocol-relative"
         elif href.startswith("/"):  # Root-relative URL
-            full_url = urljoin(base_url, href)
+            full_url = urljoin(source_url, href)
             link_type = "Root-relative"
         elif href.startswith("./"):  # Current directory relative
-            full_url = urljoin(base_url, href[2:])  # Remove "./"
+            full_url = urljoin(source_url, href[2:])  # Remove "./"
             link_type = "Current directory relative"
         elif href.startswith("../"):  # Parent directory relative
-            full_url = urljoin(base_url, href)
+            full_url = urljoin(source_url, href)
             link_type = "Parent directory relative"
         else:  # Other cases (relative without `.` or `/`)
-            full_url = urljoin(base_url + "/", href)
+            full_url = urljoin(source_url + "/", href)
             link_type = "Other relative"
 
         return full_url
