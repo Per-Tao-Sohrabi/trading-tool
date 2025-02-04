@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
+#from selenium import webdriver
+#from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.common.by import By
 import re
 from urllib.parse import urljoin
 
@@ -10,24 +10,12 @@ from urllib.parse import urljoin
 class RecursiveScraper:
 
     def __init__(self):  #self, key_words_dict=None, base_url=None
-        #self.key_words = key_words_dict
-
-        #self.recursions = (
-        #    len(self.key_words) - 1
-        #)  # len = 1. # declare number of recursive steps.
-
-        #self.super_url = base_url
-
         self.result = []
-
         pass
 
     def scrap(self, key_words_dict=None, base_url=None):
-        
-        recursions = (
-            len(key_words_dict) - 1
-        )  # len = 1. # declare number of recursive steps.
-
+        self.result.clear();
+        recursions = (len(key_words_dict) - 1)  # len = 1. # declare number of recursive steps.
         self.recursiveScraping(
             url=base_url, recursions=recursions, key_words=key_words_dict
         )
