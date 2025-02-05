@@ -10,17 +10,29 @@ from urllib.parse import urljoin
 class RecursiveScraper:
 
     def __init__(self):  #self, key_words_dict=None, base_url=None
+        '''
+        Initiates a RecursiveScraper object. 
+        Param:
+        - vars: 
+            - self.write: boolean, --> affects self.print_out()
+            - self.result: [] --> outputspace for recursive scraping.
+
+        - args: N/A
+        - return: N/A
+        '''
+        self.write = False
         self.result = []
         pass
 
-    def scrap(self, key_words_dict=None, source_url=None, base_url=None):
+    def scrap(self, key_words_dict=None, source_url=None, base_url=None, write=False):
+        self.write = write
         self.result.clear();
         recursions = (len(key_words_dict) - 1)  # len = 1. # declare number of recursive steps.
         
         self.recursiveScraping(
             source_url=source_url, base_url=base_url, recursions=recursions, key_words=key_words_dict
         )
-        return self.result
+        return self.result # Output contains [ source_url, [html tag-lines] ]
 
     # RECURSIVE SCRAPING MECHANISM
     def recursiveScraping(self, source_url=None, base_url=None, recursions=None, key_words={}, tot_recur=None):
@@ -35,30 +47,31 @@ class RecursiveScraper:
         if tot_recur == None:
             tot_recur = recursions
             source_url = base_url
-            print("Total recurrsions identified: ", tot_recur)
+            self.print_out("Total recurrsions identified: ", tot_recur)
 
         # Calculate distancet to base page
         distance = recursions
-        print("Distance to base case: ", distance)
+        self.print_out("Distance to base case: ", distance)
 
         # Isolate keyword at current level
         keyword_hash = key_words[
             str(distance)
         ]  # Observed the current base keyword dictionary at the end of the keywords list.
-        print("Sub page regex filters: ", keyword_hash)
+        self.print_out("Sub page regex filters: ", keyword_hash)
 
         # Normalize url
         source_url_url = source_url.rstrip("/")
         
         # Base case
         if recursions == 0:
-            print("At base page: ", source_url)
+            self.print_out("At base page: ", source_url)
 
             target_element_lines = current_page_soup.find_all(
                 keyword_hash[0], re.compile(keyword_hash[1])
             )
+            str_target_element_lines = [str(item) for item in target_element_lines]
 
-            output = [source_url, target_element_lines]
+            output = {source_url: str_target_element_lines} #CHANGE
 
             self.result.append(output)
 
@@ -81,7 +94,7 @@ class RecursiveScraper:
 
                 # store hyperlink
                 hyperlinks.append(hyperlink)
-                print("Identifyied hyperlink: ", hyperlink)
+                self.print_out("Identifyied hyperlink: ", hyperlink)
 
             # filter through hyperlinks
             filtered_hyperlinks = []
@@ -96,13 +109,13 @@ class RecursiveScraper:
                 )
 
                 # Save link if
-                print("Judjing hyperlink: ", l)
-                # print(f'key element: {keyword_hash[0]}, key word: {keyword_hash[1]}, result: {result}')
+                self.print_out("Judjing hyperlink: ", l)
+                # self.print_out(f'key element: {keyword_hash[0]}, key word: {keyword_hash[1]}, result: {result}')
                 if len(result) > 0:
                     filtered_hyperlinks.append(l)  # append
-                    print("Hyperlink accepted")
+                    self.print_out("Hyperlink accepted")
                 else:
-                    print("Hyperlink rejected")
+                    self.print_out("Hyperlink rejected")
 
             for hyperlink in filtered_hyperlinks:
                 self.recursiveScraping(
@@ -136,6 +149,15 @@ class RecursiveScraper:
         return full_url
 
 
+    def print_out(self, *args):
+        if self.write == True:
+            output = ""
+            for arg in range(args):
+                output = output + str(arg)
+
+            return output
+
+
 # MAIN
 '''
 key_words = {
@@ -149,5 +171,5 @@ riktskurs_scraper = RecursiveScraper(key_words, base_url=url)
 
 results = riktskurs_scraper.scrap()
 
-print(len(results))
+self.print_out(len(results))
 '''
